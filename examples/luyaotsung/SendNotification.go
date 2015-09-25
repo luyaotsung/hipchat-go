@@ -14,8 +14,6 @@ import (
 var (
 	Access_Token = flag.String("token", "", "Access Token")
 	Room_Name    = flag.String("name", "", "Name of Chart Room")
-	//Room_ID      = flag.String("id", "1337031", "ID of Chart Room")
-	// Webhook_Testing , 1337031, tNgowr8imQKkISK3LBI1cHDVXmkjxUPcvlmktwen
 )
 
 func get_Room_ID(token string, name string) (string, error) {
