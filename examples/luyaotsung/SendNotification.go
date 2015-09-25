@@ -11,10 +11,18 @@ import (
 	"strconv"
 )
 
-var (
-	Access_Token = flag.String("token", "", "Access Token")
-	Room_Name    = flag.String("name", "", "Name of Chart Room")
-)
+func handleRequestError(resp *http.Response, err error) {
+	if err != nil {
+		if resp != nil {
+			fmt.Printf("Request Failed:\n%+v\n", resp)
+			body, _ := ioutil.ReadAll(resp.Body)
+			fmt.Printf("%+v\n", body)
+		} else {
+			fmt.Printf("Request failed, response is nil")
+		}
+		panic(err)
+	}
+}
 
 func get_Room_ID(token string, name string) (string, error) {
 
@@ -55,19 +63,21 @@ func send_Notify(token string, id string, message string, color string) {
 
 func main() {
 
+	Access_Token := flag.String("token", "", "Access Token")
+	Room_Name := flag.String("name", "", "Name of Chart Room")
+	Notify_Message := flag.String("message", "Hey!! This is just a test message !!", "Message of Notification")
+	Notify_Color := flag.String("color", "red", "Color of Notification")
+
 	flag.Parse()
 
-	token := *Access_Token
-	name := *Room_Name
-
-	var chat_room_id string
+	var Room_ID string
 	var err error
 
-	if token == "" || name == "" {
-		fmt.Println("Please nput Access Token and Room Name")
+	if *Access_Token == "" || *Room_Name == "" {
+		fmt.Println("Please Input Access Token and Room Name")
 		os.Exit(-1)
 	} else {
-		chat_room_id, err = get_Room_ID(token, name)
+		Room_ID, err = get_Room_ID(*Access_Token, *Room_Name)
 
 		if err != nil {
 			fmt.Printf("Get Room ID Fail %+v \n", err)
@@ -75,28 +85,12 @@ func main() {
 
 		fmt.Printf("Access Token %s \n", *Access_Token)
 		fmt.Printf("Chat Room Name %s \n", *Room_Name)
-		fmt.Printf("Chat Room ID %d \n", chat_room_id)
+		fmt.Printf("Chat Room ID %d \n", Room_ID)
 
 	}
 
-	message := "Hi This is just a test"
-	color := "green"
-
-	send_Notify(token, chat_room_id, message, color)
+	send_Notify(*Access_Token, Room_ID, *Notify_Message, *Notify_Color)
 
 	fmt.Printf("Notification sent ! \n")
 
-}
-
-func handleRequestError(resp *http.Response, err error) {
-	if err != nil {
-		if resp != nil {
-			fmt.Printf("Request Failed:\n%+v\n", resp)
-			body, _ := ioutil.ReadAll(resp.Body)
-			fmt.Printf("%+v\n", body)
-		} else {
-			fmt.Printf("Request failed, response is nil")
-		}
-		panic(err)
-	}
 }
